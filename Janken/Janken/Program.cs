@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace janken2
 {
@@ -319,26 +320,82 @@ namespace janken2
 
             }
 
-            //結果発表
+            //結果発表 (コンソール)
             Console.WriteLine("成績を見ますか？");
             Console.WriteLine("1:見る　　2：見ない");
-            int fin = int.Parse(Console.ReadLine());
-            if (fin == 1)
+            int rst = int.Parse(Console.ReadLine());
+            if (rst == 1)
             {
                 Console.WriteLine("【結果発表】");
                 for (int i = 0; i < pNum; i++)
                 {
                     pwinper[i] = ((float)pwincnt[i] / (float)bNum) * 100;
-                    Console.Write("P" + (i + 1) + ":" + "勝ち:" + pwincnt[i] + "回" + ",  " + "負け:" + plosecnt[i] + "回" + ",  " + "勝率:" + "{0:0.##}", pwinper[i] + "%");
+                    Console.Write("P" + (i + 1) + ":" + "勝ち:" + pwincnt[i] + "回" + ",  " + "負け:" + plosecnt[i] + "回" + ",  " + "勝率:" + pwinper[i].ToString("f2") + "%");
                     Console.WriteLine("");
                 }
                 for (int i = 0; i < cNum; i++)
                 {
                     cwinper[i] = ((float)cwincnt[i] / (float)bNum) * 100;
-                    Console.Write("C" + (i + 1) + ":" + "勝ち:" + cwincnt[i] + "回" + ",  " + "負け:" + closecnt[i] + "回" + ",  " + "勝率:" + "{0:0.##}", cwinper[i] + "%");
+                    Console.Write("C" + (i + 1) + ":" + "勝ち:" + cwincnt[i] + "回" + ",  " + "負け:" + closecnt[i] + "回" + ",  " + "勝率:" + cwinper[i].ToString("f2") + "%");
                     Console.WriteLine("");
                 }
                 Console.WriteLine();
+
+            }
+
+            //結果発表(ファイル出力)
+            /*例　【結果発表】
+                    P1:勝ち:3回,  負け:1回,  勝率:75.00%
+                    C1:勝ち:2回,  負け:2回,  勝率:50.00%
+                    C2:勝ち:2回,  負け:2回,  勝率:50.00%　*/
+            Console.WriteLine("この結果をファイルに出力しますか？");
+            Console.WriteLine("1:出力する　　2：出力しない");
+            int output = int.Parse(Console.ReadLine());
+            if (output == 1)
+            {
+                Console.WriteLine("結果ファイルの出力先のパスを入力して下さい");
+                string path = Console.ReadLine();
+                Console.WriteLine("結果ファイルの名前を拡張子も含めて入力して下さい");
+                string name = Console.ReadLine();
+                string pn = path + "\\" + name; //pathとファイル名を組み合わせた文字列
+                Encoding enc = Encoding.GetEncoding("Shift_JIS"); //文字化け防止のため文字コードをShift-JISに指定
+                var resultfile = new StreamWriter(@pn, append:false, encoding:enc); //ファイルを開く
+                resultfile.WriteLine("【結果発表】");
+
+                if (SubstringRight(name, 3) == "csv" || SubstringRight(name, 3) == "CSV") 
+                {
+                    resultfile.WriteLine(" " + "  ," + "勝ち" + "  ," + "負け" + "  ," + "勝率");
+                    for (int i = 0; i < pNum; i++)
+                    {
+                        pwinper[i] = ((float)pwincnt[i] / (float)bNum) * 100;
+                        resultfile.Write("P" + (i + 1)+ ",  " + pwincnt[i] + "回" + ",  " + plosecnt[i] + "回" + ",  " + pwinper[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                    for (int i = 0; i < cNum; i++)
+                    {
+                        cwinper[i] = ((float)cwincnt[i] / (float)bNum) * 100;
+                        resultfile.Write("C" + (i + 1) + ",  " + cwincnt[i] + "回" + ",  " + closecnt[i] + "回" + ",  " + cwinper[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                }
+                else {
+                    for (int i = 0; i < pNum; i++)
+                    {
+                        pwinper[i] = ((float)pwincnt[i] / (float)bNum) * 100;
+                        resultfile.Write("P" + (i + 1) + ":" + "勝ち:" + pwincnt[i] + "回" + ",  " + "負け:" + plosecnt[i] + "回" + ",  " + "勝率:" + pwinper[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                    for (int i = 0; i < cNum; i++)
+                    {
+                        cwinper[i] = ((float)cwincnt[i] / (float)bNum) * 100;
+                        resultfile.Write("C" + (i + 1) + ":" + "勝ち:" + cwincnt[i] + "回" + ",  " + "負け:" + closecnt[i] + "回" + ",  " + "勝率:" + cwinper[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                }
+             
+                resultfile.WriteLine();
+
+                resultfile.Close();
 
             }
 
@@ -363,7 +420,10 @@ namespace janken2
             }
         }
 
-
+        static string SubstringRight(string target, int length) //文字列targetの右からlength文字取り出して抜き出すメソッド
+        {
+            return target.Substring(target.Length - length, length);
+        }
 
     }
 
