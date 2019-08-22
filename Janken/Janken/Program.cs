@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
-namespace janken2
+namespace Janken
 {
     class Program
     {
@@ -20,54 +21,54 @@ namespace janken2
             Console.WriteLine("###############################################");
             Console.WriteLine("");
             Console.WriteLine("プレイヤーは何人参加しますか？");
-            int pNum = int.Parse(Console.ReadLine()); //プレイヤーの数を入力
+            int PlayerNum = int.Parse(Console.ReadLine()); //プレイヤーの数を入力
             Console.WriteLine("CPUは何人参加させますか？");
-            int cNum = int.Parse(Console.ReadLine()); //CPUの数を入力
+            int CpuNum = int.Parse(Console.ReadLine()); //CPUの数を入力
             Console.WriteLine("何戦勝負にしますか？");
-            int bNum = int.Parse(Console.ReadLine()); //何回勝負にするか入力
+            int BattleNum = int.Parse(Console.ReadLine()); //何回勝負にするか入力
 
-            int[] iplayer = new int[pNum]; //各プレイヤーの手を格納する配列。
-            int[] icpu = new int[cNum]; //各CPUの手を格納する配列。
-            string[] splayer = new string[pNum]; //N番目のプレイヤーが出した手をグー、チョキ、パーとして文字列で格納する配列
-            string[] scpu = new string[cNum]; //N番目のCPUが出した手をグー、チョキ、パーとして文字列で格納する配列
+            int[] iplayer = new int[PlayerNum]; //各プレイヤーの手を格納する配列。
+            int[] icpu = new int[CpuNum]; //各CPUの手を格納する配列。
+            string[] splayer = new string[PlayerNum]; //N番目のプレイヤーが出した手をグー、チョキ、パーとして文字列で格納する配列
+            string[] scpu = new string[CpuNum]; //N番目のCPUが出した手をグー、チョキ、パーとして文字列で格納する配列
 
-            int[] pwincnt = new int[pNum]; //各プレイヤーの勝ち数を格納する配列。
-            int[] cwincnt = new int[cNum]; //各CPUの勝ち数を格納する配列。
-            int[] plosecnt = new int[pNum]; //各プレイヤーの負け数を格納する配列。
-            int[] closecnt = new int[cNum]; //各CPUの負け数を格納する配列。
-            float[] pwinper = new float[pNum]; //各プレイヤーの勝率を格納する配列。
-            float[] cwinper = new float[cNum];　//各CPUの勝率を格納する配列。
+            int[] PlayerWinningCount = new int[PlayerNum]; //各プレイヤーの勝ち数を格納する配列。
+            int[] CpuWinningCount = new int[CpuNum]; //各CPUの勝ち数を格納する配列。
+            int[] PlayerLoseCount = new int[PlayerNum]; //各プレイヤーの負け数を格納する配列。
+            int[] CpuLoseCount = new int[CpuNum]; //各CPUの負け数を格納する配列。
+            float[] PlayerWinningPercentage = new float[PlayerNum]; //各プレイヤーの勝率を格納する配列。
+            float[] CpuWinningPercentage = new float[CpuNum];　//各CPUの勝率を格納する配列。
 
-            int[] itotal = new int[pNum + cNum]; 　//プレイヤーとCPUの出した手を数値で格納する配列。
-            string[] stotal = new string[pNum + cNum]; //プレイヤーとCPUの出した手を文字で格納する配列。
+            int[] itotal = new int[PlayerNum + CpuNum]; 　//プレイヤーとCPUの出した手を数値で格納する配列。
+            string[] stotal = new string[PlayerNum + CpuNum]; //プレイヤーとCPUの出した手を文字で格納する配列。
 
 
-            for (int n = 0; n < bNum; n++)
+            for (int n = 1; n <= BattleNum; n++)
             {
-                if (n > 0) //2回戦以降の変数の初期化
+                int gcnt = 0; //グーを出した人をカウントする変数
+                int ccnt = 0; //チョキを出した人をカウントする変数
+                int pcnt = 0; //パーを出した人をカウントする変数
+
+                if (n >= 2) //2回戦以降の変数の初期化
                 {
-                    for (int x = 0; x < pNum; x++) //iplayerとsplayerの初期化
+                    for (int x = 0; x < PlayerNum; x++) //iplayerとsplayerの初期化
                     {
                         iplayer[x] = 0;
                         splayer[x] = "";
                     }
 
-                    for (int x = 0; x < cNum; x++) //icpuとscpuの初期化
+                    for (int x = 0; x < CpuNum; x++) //icpuとscpuの初期化
                     {
                         icpu[x] = 0;
                         scpu[x] = "";
                     }
 
-
-
                 }
 
-
-
-                Console.WriteLine((n + 1) + "回戦目");
+                Console.WriteLine(n + "回戦目");
                 Console.WriteLine("じゃんけんをしましょう。");
                 Console.WriteLine("");
-                for (int i = 0; i < pNum; i++)
+                for (int i = 0; i < PlayerNum; i++)
                 {
                     Console.WriteLine("●プレイヤー" + (i + 1) + "は何を出しますか？");
                     Console.WriteLine("---------------------------------");
@@ -92,23 +93,23 @@ namespace janken2
                 }
 
                 Random cRandom = new System.Random();  //Randomクラスのあたらしいインスタンスを作成
-                for (int i = 0; i < cNum; i++)
+                for (int i = 0; i < CpuNum; i++)
                 {
                     icpu[i] = cRandom.Next(1, 4); //1以上4未満(1から3)の乱数を取得し、CPU側の手とする。
                     scpu[i] = convert(icpu[i]); //数をグー、チョキ、パーに変換
-                    itotal[i + pNum] = icpu[i];
-                    stotal[i + pNum] = convert(icpu[i]);
+                    itotal[i + PlayerNum] = icpu[i];
+                    stotal[i + PlayerNum] = convert(icpu[i]);
                 }
 
                 Console.WriteLine("");
 
-                for (int i = 0; i < pNum; i++)
+                for (int i = 0; i < PlayerNum; i++)
                 {
                     Console.Write("P" + (i + 1) + ":" + stotal[i] + "  ");
                 }
-                for (int i = pNum; i < pNum + cNum; i++)
+                for (int i = PlayerNum; i < PlayerNum + CpuNum; i++)
                 {
-                    Console.Write("C" + (i - pNum + 1) + ":" + stotal[i] + "  ");
+                    Console.Write("C" + (i - PlayerNum + 1) + ":" + stotal[i] + "  ");
                 }
 
                 Console.WriteLine("");
@@ -116,10 +117,6 @@ namespace janken2
 
 
                 //以下勝敗判定
-                int gcnt = 0; //グーを出した人をカウントする変数
-                int ccnt = 0; //チョキを出した人をカウントする変数
-                int pcnt = 0; //パーを出した人をカウントする変数
-
                 for (int i = 0; i < itotal.Length; i++)
                 {
                     switch (itotal[i])
@@ -150,7 +147,7 @@ namespace janken2
                     ccnt = 0; //チョキカウンタの初期化
                     pcnt = 0; //パーカウンタの初期化
 
-                    for (int i = 0; i < pNum; i++)
+                    for (int i = 0; i < PlayerNum; i++)
                     {
                         Console.WriteLine("●プレイヤー" + (i + 1) + "は何を出しますか？");
                         Console.WriteLine("---------------------------------");
@@ -174,12 +171,12 @@ namespace janken2
                         }
                     }
 
-                    for (int i = 0; i < cNum; i++)
+                    for (int i = 0; i < CpuNum; i++)
                     {
                         icpu[i] = cRandom.Next(1, 4); //1以上4未満(1から3)の乱数を取得し、CPU側の手とする。
                         scpu[i] = convert(icpu[i]); //数をグー、チョキ、パーに変換
-                        itotal[i + pNum] = icpu[i];
-                        stotal[i + pNum] = convert(icpu[i]);
+                        itotal[i + PlayerNum] = icpu[i];
+                        stotal[i + PlayerNum] = convert(icpu[i]);
                     }
                     Console.WriteLine("");
                     Console.WriteLine("");
@@ -200,13 +197,13 @@ namespace janken2
                         }
                     }
 
-                    for (int i = 0; i < pNum; i++)
+                    for (int i = 0; i < PlayerNum; i++)
                     {
                         Console.Write("P" + (i + 1) + ":" + stotal[i] + "  ");
                     }
-                    for (int i = pNum; i < pNum + cNum; i++)
+                    for (int i = PlayerNum; i < PlayerNum + CpuNum; i++)
                     {
-                        Console.Write("C" + (i - pNum + 1) + ":" + stotal[i] + "  ");
+                        Console.Write("C" + (i - PlayerNum + 1) + ":" + stotal[i] + "  ");
                     }
                     Console.WriteLine("");
                     ap = (gcnt == 0 && ccnt == 0);
@@ -223,28 +220,28 @@ namespace janken2
                     Console.WriteLine("");
                     Console.WriteLine("グーを出した人の勝ちです。");
                     Console.WriteLine("勝者は");
-                    for (int i = 0; i < pNum; i++)
+                    for (int i = 0; i < PlayerNum; i++)
                     {
                         if (iplayer[i] == 1)
                         {
-                            pwincnt[i] += 1;
+                            PlayerWinningCount[i] += 1;
                             Console.WriteLine("P" + (i + 1));
                         }
                         else
                         {
-                            plosecnt[i] += 1;
+                            PlayerLoseCount[i] += 1;
                         }
                     }
-                    for (int i = 0; i < cNum; i++)
+                    for (int i = 0; i < CpuNum; i++)
                     {
                         if (icpu[i] == 1)
                         {
-                            cwincnt[i] += 1;
+                            CpuWinningCount[i] += 1;
                             Console.WriteLine("C" + (i + 1));
                         }
                         else
                         {
-                            closecnt[i] += 1;
+                            CpuLoseCount[i] += 1;
                         }
                     }
                     Console.WriteLine("以上です。");
@@ -255,90 +252,138 @@ namespace janken2
                     Console.WriteLine("");
                     Console.WriteLine("チョキを出した人の勝ちです。");
                     Console.WriteLine("勝者は");
-                    for (int i = 0; i < pNum; i++)
+                    for (int i = 0; i < PlayerNum; i++)
                     {
                         if (iplayer[i] == 2)
                         {
-                            pwincnt[i] += 1;
+                            PlayerWinningCount[i] += 1;
                             Console.WriteLine("P" + (i + 1));
                         }
                         else
                         {
-                            plosecnt[i] += 1;
+                            PlayerLoseCount[i] += 1;
                         }
                     }
-                    for (int i = 0; i < cNum; i++)
+                    for (int i = 0; i < CpuNum; i++)
                     {
                         if (icpu[i] == 2)
                         {
-                            cwincnt[i] += 1;
+                            CpuWinningCount[i] += 1;
                             Console.WriteLine("C" + (i + 1));
                         }
                         else
                         {
-                            closecnt[i] += 1;
+                            CpuLoseCount[i] += 1;
                         }
                     }
                     Console.WriteLine("以上です。");
                     Console.WriteLine("--------------------------------------");
                 }
-
                 else
                 {
                     Console.WriteLine("");
                     Console.WriteLine("パーを出した人の勝ちです。");
                     Console.WriteLine("勝者は");
-                    for (int i = 0; i < pNum; i++)
+                    for (int i = 0; i < PlayerNum; i++)
                     {
                         if (iplayer[i] == 3)
                         {
-                            pwincnt[i] += 1;
+                            PlayerWinningCount[i] += 1;
                             Console.WriteLine("P" + (i + 1));
                         }
                         else
                         {
-                            plosecnt[i] += 1;
+                            PlayerLoseCount[i] += 1;
                         }
                     }
-                    for (int i = 0; i < cNum; i++)
+                    for (int i = 0; i < CpuNum; i++)
                     {
                         if (icpu[i] == 3)
                         {
-                            cwincnt[i] += 1;
+                            CpuWinningCount[i] += 1;
                             Console.WriteLine("C" + (i + 1));
                         }
                         else
                         {
-                            closecnt[i] += 1;
+                            CpuLoseCount[i] += 1;
                         }
                     }
                     Console.WriteLine("以上です。");
                     Console.WriteLine("--------------------------------------");
                 }
 
-
             }
-
-            //結果発表
+            //結果発表 (コンソール)
             Console.WriteLine("成績を見ますか？");
             Console.WriteLine("1:見る　　2：見ない");
-            int fin = int.Parse(Console.ReadLine());
-            if (fin == 1)
+            int rst = int.Parse(Console.ReadLine());
+            if (rst == 1)
             {
                 Console.WriteLine("【結果発表】");
-                for (int i = 0; i < pNum; i++)
+                for (int i = 0; i < PlayerNum; i++)
                 {
-                    pwinper[i] = ((float)pwincnt[i] / (float)bNum) * 100;
-                    Console.Write("P" + (i + 1) + ":" + "勝ち:" + pwincnt[i] + "回" + ",  " + "負け:" + plosecnt[i] + "回" + ",  " + "勝率:" + "{0:0.##}", pwinper[i] + "%");
+                    PlayerWinningPercentage[i] = ((float)PlayerWinningCount[i] / (float)BattleNum) * 100;
+                    Console.Write("P" + (i + 1) + ":" + "勝ち:" + PlayerWinningCount[i] + "回" + ",  " + "負け:" + PlayerLoseCount[i] + "回" + ",  " + "勝率:" + PlayerWinningPercentage[i].ToString("f2") + "%");
                     Console.WriteLine("");
                 }
-                for (int i = 0; i < cNum; i++)
+                for (int i = 0; i < CpuNum; i++)
                 {
-                    cwinper[i] = ((float)cwincnt[i] / (float)bNum) * 100;
-                    Console.Write("C" + (i + 1) + ":" + "勝ち:" + cwincnt[i] + "回" + ",  " + "負け:" + closecnt[i] + "回" + ",  " + "勝率:" + "{0:0.##}", cwinper[i] + "%");
+                    CpuWinningPercentage[i] = ((float)CpuWinningCount[i] / (float)BattleNum) * 100;
+                    Console.Write("C" + (i + 1) + ":" + "勝ち:" + CpuWinningCount[i] + "回" + ",  " + "負け:" + CpuLoseCount[i] + "回" + ",  " + "勝率:" + CpuWinningPercentage[i].ToString("f2") + "%");
                     Console.WriteLine("");
                 }
                 Console.WriteLine();
+
+            }
+
+            Console.WriteLine("この結果をファイルに出力しますか？");
+            Console.WriteLine("1:出力する　　2：出力しない");
+            int output = int.Parse(Console.ReadLine());
+            if (output == 1)
+            {
+                Console.WriteLine("結果ファイルの出力先のパスを入力して下さい");
+                string path = Console.ReadLine();
+                Console.WriteLine("結果ファイルの名前を拡張子も含めて入力して下さい");
+                string name = Console.ReadLine();
+                string pn = path + "\\" + name; //pathとファイル名を組み合わせた文字列
+                Encoding enc = Encoding.GetEncoding("Shift_JIS"); //文字化け防止のため文字コードをShift-JISに指定
+                var resultfile = new StreamWriter(@pn, append:false, encoding:enc); //ファイルを開く
+                resultfile.WriteLine("【結果発表】");
+
+                if (SubstringRight(name, 3) == "csv" || SubstringRight(name, 3) == "CSV") 
+                {
+                    resultfile.WriteLine(" " + "  ," + "勝ち" + "  ," + "負け" + "  ," + "勝率");
+                    for (int i = 0; i < PlayerNum; i++)
+                    {
+                        PlayerWinningPercentage[i] = ((float)PlayerWinningCount[i] / (float)BattleNum) * 100;
+                        resultfile.Write("P" + (i + 1)+ ",  " + PlayerWinningCount[i] + "回" + ",  " + PlayerLoseCount[i] + "回" + ",  " + PlayerWinningPercentage[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                    for (int i = 0; i < CpuNum; i++)
+                    {
+                        CpuWinningPercentage[i] = ((float)CpuWinningCount[i] / (float)BattleNum) * 100;
+                        resultfile.Write("C" + (i + 1) + ",  " + CpuWinningCount[i] + "回" + ",  " + CpuLoseCount[i] + "回" + ",  " + CpuWinningPercentage[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                }
+                else {
+                    for (int i = 0; i < PlayerNum; i++)
+                    {
+                        PlayerWinningPercentage[i] = ((float)PlayerWinningCount[i] / (float)BattleNum) * 100;
+                        resultfile.Write("P" + (i + 1) + ":" + "勝ち:" + PlayerWinningCount[i] + "回" + ",  " + "負け:" + PlayerLoseCount[i] + "回" + ",  " + "勝率:" + PlayerWinningPercentage[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                    for (int i = 0; i < CpuNum; i++)
+                    {
+                        CpuWinningPercentage[i] = ((float)CpuWinningCount[i] / (float)BattleNum) * 100;
+                        resultfile.Write("C" + (i + 1) + ":" + "勝ち:" + CpuWinningCount[i] + "回" + ",  " + "負け:" + CpuLoseCount[i] + "回" + ",  " + "勝率:" + CpuWinningPercentage[i].ToString("f2") + "%");
+                        resultfile.WriteLine("");
+                    }
+                }
+             
+                resultfile.WriteLine();
+
+                resultfile.Close();
 
             }
 
@@ -363,7 +408,10 @@ namespace janken2
             }
         }
 
-
+        static string SubstringRight(string target, int length) //文字列targetの右からlength文字取り出して抜き出すメソッド
+        {
+            return target.Substring(target.Length - length, length);
+        }
 
     }
 
